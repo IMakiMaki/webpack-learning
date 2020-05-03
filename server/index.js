@@ -1,4 +1,8 @@
-const renderMarkUp = require('./utils');
+if (typeof window === 'undefined') {
+  global.window = {};
+}
+
+const { renderMarkUp } = require('./utils');
 const express = require('express');
 const { renderToString } = require('react-dom/server');
 const SSR = require('../dist/index-server');
@@ -8,7 +12,7 @@ const server = port => {
   app.use(express.static('dist'));
 
   app.get('/server-side-render', (req, res) => {
-    const html = renderMarkUp(renderToString(SSR));
+    const html = renderMarkUp(renderToString([SSR]));
     res.status(200).send(html);
   });
 

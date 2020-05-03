@@ -8,14 +8,9 @@
     "build": "webpack --config build/webpack.prod.js --progress",
     "dev": "webpack-dev-server --config build/webpack.dev.js --progress",
     "build:ssr": "webpack --config build/webpack.ssr.js --progress",
-    "lint": "./node_modules/.bin/eslint --ext .js src",
-    "fix": "./node_modules/.bin/eslint --fix --ext .js src"
+    "lint": "eslint --ext .js src",
+    "fix": "eslint --fix --ext .js src"
   },
-  "browserslist": [
-    "last 2 version",
-    ">1%",
-    "ios 7"
-  ],
   "keywords": [],
   "author": "",
   "license": "ISC",

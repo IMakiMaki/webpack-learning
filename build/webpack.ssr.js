@@ -4,7 +4,7 @@ const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-// const HtmlInlineCssWebpackPlugin = require('html-inline-css-webpack-plugin').default;
+const HtmlInlineCssWebpackPlugin = require('html-inline-css-webpack-plugin').default;
 
 const { entry, htmlWebpackPlugins, htmlWebpackExternalsPlugins } = setMPA('server');
 module.exports = {
@@ -87,9 +87,10 @@ module.exports = {
       assetNameRegExp: /\.css$/g,
       cssProcessor: require('cssnano')
     }),
-    ...htmlWebpackPlugins
-    // ...htmlWebpackExternalsPlugins, // 用来抽出指定在externals.config.js中的库到 /dist/vendor
-    // new HtmlInlineCssWebpackPlugin(), 用来将css内联到html中
+    // ...htmlWebpackPlugins
+    ...htmlWebpackExternalsPlugins, // 用来抽出指定在externals.config.js中的库到 /dist/vendor
+    new HtmlInlineCssWebpackPlugin()
+    // 用来将css内联到html中
   ],
   optimization: {
     splitChunks: {
