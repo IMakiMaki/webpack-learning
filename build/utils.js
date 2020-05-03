@@ -27,7 +27,7 @@ module.exports = {
             preserveLineBreaks: false,
             minifyCSS: true,
             minifyJS: true,
-            removeComments: true
+            removeComments: type === 'server' ? false : true // 服务端渲染需要把注释开启 不然会删掉占位符
           }
         })
       );

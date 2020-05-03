@@ -2,6 +2,7 @@ const path = require('path');
 const { HotModuleReplacementPlugin } = require('webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { setMPA } = require('./utils');
+const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 
 const { entry, htmlWebpackPlugins } = setMPA();
 
@@ -48,11 +49,17 @@ module.exports = {
       }
     ]
   },
-  plugins: [new CleanWebpackPlugin(), new HotModuleReplacementPlugin(), ...htmlWebpackPlugins],
+  plugins: [
+    new CleanWebpackPlugin(),
+    new HotModuleReplacementPlugin(),
+    ...htmlWebpackPlugins,
+    new FriendlyErrorsWebpackPlugin()
+  ],
   devServer: {
     contentBase: '../dist',
     open: false,
-    hot: true
+    hot: true,
+    stats: 'errors-only'
   },
   devtool: 'eval-source-map'
 };
