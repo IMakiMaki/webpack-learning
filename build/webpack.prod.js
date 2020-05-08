@@ -12,19 +12,19 @@ module.exports = {
   entry: entry,
   output: {
     path: path.join(__dirname, '../dist'),
-    filename: '[name]_[chunkhash:8].js'
+    filename: '[name]_[chunkhash:8].js',
   },
   mode: 'production',
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, '../src')
-    }
+      '@': path.resolve(__dirname, '../src'),
+    },
   },
   module: {
     rules: [
       {
         test: /\.js$/,
-        use: ['babel-loader', 'eslint-loader']
+        use: ['babel-loader', 'eslint-loader'],
       },
       {
         test: /\.css$/,
@@ -34,10 +34,10 @@ module.exports = {
           {
             loader: 'postcss-loader',
             options: {
-              plugins: () => [require('autoprefixer')]
-            }
-          }
-        ]
+              plugins: () => [require('autoprefixer')],
+            },
+          },
+        ],
       },
       {
         test: /\.less$/,
@@ -47,11 +47,11 @@ module.exports = {
           {
             loader: 'postcss-loader',
             options: {
-              plugins: () => [require('autoprefixer')]
-            }
+              plugins: () => [require('autoprefixer')],
+            },
           },
-          'less-loader'
-        ]
+          'less-loader',
+        ],
       },
       {
         test: /\.(png|jpg|gif|jpeg)$/,
@@ -59,10 +59,10 @@ module.exports = {
           {
             loader: 'file-loader',
             options: {
-              name: '[name]_[hash:8].[ext]'
-            }
-          }
-        ]
+              name: '[name]_[hash:8].[ext]',
+            },
+          },
+        ],
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
@@ -70,26 +70,28 @@ module.exports = {
           {
             loader: 'file-loader',
             options: {
-              name: '[name]_[hash:8].[ext]'
-            }
-          }
-        ]
-      }
-    ]
+              name: '[name]_[hash:8].[ext]',
+            },
+          },
+        ],
+      },
+    ],
   },
   plugins: [
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
-      filename: '[name]_[contenthash:8].css'
+      filename: '[name]_[contenthash:8].css',
     }),
     new OptimizeCssAssetsWebpackPlugin({
       assetNameRegExp: /\.css$/g,
-      cssProcessor: require('cssnano')
+      cssProcessor: require('cssnano'),
     }),
     ...htmlWebpackPlugins,
     // ...htmlWebpackExternalsPlugins, // 用来抽出指定在externals.config.js中的库到 /dist/vendor
     // new HtmlInlineCssWebpackPlugin(), 用来将css内联到html中
-    new FriendlyErrorsWebpackPlugin()
+    new FriendlyErrorsWebpackPlugin(),
+    // 手动捕获构建错误
+    function () {},
   ],
   optimization: {
     splitChunks: {
@@ -97,15 +99,15 @@ module.exports = {
         vendor: {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendor',
-          chunks: 'all'
+          chunks: 'all',
         },
         commons: {
           test: /[\\/]src[\\/]common[\\/]/,
           name: 'commons',
-          chunks: 'all'
-        }
-      }
-    }
+          chunks: 'all',
+        },
+      },
+    },
   },
-  stats: 'errors-only'
+  stats: 'errors-only',
 };

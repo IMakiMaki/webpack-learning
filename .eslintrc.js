@@ -9,8 +9,7 @@ module.exports = {
     node: true,
     es6: true
   },
-  plugins: ['xmfe'],
-  extends: ['plugin:xmfe/react'],
+  extends: ['eslint:recommended', 'plugin:react-app/recommended', 'plugin:prettier/recommended'],
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
