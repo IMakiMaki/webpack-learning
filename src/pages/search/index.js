@@ -11,7 +11,7 @@ class Search extends React.Component {
     return (
       <div className="search-text">
         Search Test{two()}
-        <img src={icon}></img>
+        <img src={icon} alt=""></img>
       </div>
     );
   }

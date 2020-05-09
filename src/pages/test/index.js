@@ -9,14 +9,14 @@ class Search extends React.Component {
   constructor() {
     super(...arguments);
     this.state = {
-      Text: null
+      Text: null,
     };
   }
 
   loadComponent() {
-    import('./text.js').then(Text => {
+    import('./text.js').then((Text) => {
       this.setState({
-        Text: Text.default
+        Text: Text.default,
       });
     });
   }

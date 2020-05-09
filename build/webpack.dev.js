@@ -10,27 +10,27 @@ module.exports = {
   entry: entry,
   output: {
     path: path.join(__dirname, '../dist'),
-    filename: '[name].js'
+    filename: '[name].js',
   },
   mode: 'development',
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, '../src')
-    }
+      '@': path.resolve(__dirname, '../src'),
+    },
   },
   module: {
     rules: [
       {
         test: /\.js$/,
-        use: 'babel-loader'
+        use: 'babel-loader',
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader']
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.less$/,
-        use: ['style-loader', 'css-loader', 'less-loader']
+        use: ['style-loader', 'css-loader', 'less-loader'],
       },
       {
         test: /\.(png|jpg|gif|jpeg)$/,
@@ -38,28 +38,28 @@ module.exports = {
           {
             loader: 'url-loader',
             options: {
-              limit: 10240
-            }
-          }
-        ]
+              limit: 10240,
+            },
+          },
+        ],
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
-        use: 'file-loader'
-      }
-    ]
+        use: 'file-loader',
+      },
+    ],
   },
   plugins: [
     new CleanWebpackPlugin(),
     new HotModuleReplacementPlugin(),
     ...htmlWebpackPlugins,
-    new FriendlyErrorsWebpackPlugin()
+    new FriendlyErrorsWebpackPlugin(),
   ],
   devServer: {
     contentBase: '../dist',
     open: false,
     hot: true,
-    stats: 'errors-only'
+    stats: 'errors-only',
   },
-  devtool: 'eval-source-map'
+  devtool: 'eval-source-map',
 };

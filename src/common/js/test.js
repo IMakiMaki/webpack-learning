@@ -1,7 +1,7 @@
-(function() {
+(function () {
   let arr = [];
   let a = '12';
-  Object.keys(windows => key => {
+  Object.keys((windows) => (key) => {
     if (a !== key) {
       arr.push(key);
     }

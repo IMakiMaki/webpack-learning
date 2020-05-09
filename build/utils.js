@@ -11,7 +11,7 @@ module.exports = {
     const htmlWebpackPlugins = [];
     const htmlWebpackExternalsPlugins = [];
     const entryFiles = glob.sync(path.join(__dirname, `../src/pages/*/index${suffix}.js`));
-    entryFiles.forEach(entryFile => {
+    entryFiles.forEach((entryFile) => {
       const match = entryFile.match(new RegExp(`src/pages/(.*)/index${suffix}.js`));
       const pageName = match && match[1];
       entry[pageName] = entryFile;
@@ -27,15 +27,15 @@ module.exports = {
             preserveLineBreaks: false,
             minifyCSS: true,
             minifyJS: true,
-            removeComments: type === 'server' ? false : true // 服务端渲染需要把注释开启 不然会删掉占位符
-          }
+            removeComments: type === 'server' ? false : true, // 服务端渲染需要把注释开启 不然会删掉占位符
+          },
         })
       );
       htmlWebpackExternalsPlugins.push(
         new htmlWebpackExternalsPlugin({
           externals: externalsConfig,
           hash: true,
-          files: [`${pageName}.html`]
+          files: [`${pageName}.html`],
         })
       );
     });
@@ -43,7 +43,7 @@ module.exports = {
     return {
       entry,
       htmlWebpackPlugins,
-      htmlWebpackExternalsPlugins
+      htmlWebpackExternalsPlugins,
     };
-  }
+  },
 };
