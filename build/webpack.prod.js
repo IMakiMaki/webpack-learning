@@ -5,10 +5,14 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
+const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 // const HtmlInlineCssWebpackPlugin = require('html-inline-css-webpack-plugin').default;
 
 const { entry, htmlWebpackPlugins, htmlWebpackExternalsPlugins } = setMPA();
-module.exports = {
+const smp = new SpeedMeasurePlugin();
+
+module.exports = smp.wrap({
   entry: entry,
   output: {
     path: path.join(__dirname, '../dist'),
@@ -90,6 +94,7 @@ module.exports = {
     // ...htmlWebpackExternalsPlugins, // 用来抽出指定在externals.config.js中的库到 /dist/vendor
     // new HtmlInlineCssWebpackPlugin(), 用来将css内联到html中
     new FriendlyErrorsWebpackPlugin(),
+    new BundleAnalyzerPlugin(),
     // 手动捕获构建错误
     function () {
       this.hooks.done.tap('done', (stats) => {
@@ -106,11 +111,13 @@ module.exports = {
   optimization: {
     splitChunks: {
       cacheGroups: {
-        vendor: {
+        // 将node_modules的包分离
+        vendors: {
           test: /[\\/]node_modules[\\/]/,
-          name: 'vendor',
+          name: 'vendors',
           chunks: 'all',
         },
+        // 将commons的包分离
         commons: {
           test: /[\\/]src[\\/]common[\\/]/,
           name: 'commons',
@@ -119,5 +126,5 @@ module.exports = {
       },
     },
   },
-  stats: 'errors-only',
-};
+  // stats: 'errors-only',
+});
