@@ -7,7 +7,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 const HtmlInlineCssWebpackPlugin = require('html-inline-css-webpack-plugin').default;
 
-const { entry, htmlWebpackPlugins, htmlWebpackExternalsPlugins } = setMPA('server');
+const { entry, htmlWebpackPlugins } = setMPA('server');
 module.exports = {
   entry: entry,
   output: {
@@ -88,7 +88,6 @@ module.exports = {
       cssProcessor: require('cssnano'),
     }),
     ...htmlWebpackPlugins,
-    // ...htmlWebpackExternalsPlugins, // 用来抽出指定在externals.config.js中的库到 /dist/vendor
     new HtmlInlineCssWebpackPlugin(),
     // 用来将css内联到html中
     new FriendlyErrorsWebpackPlugin(),

@@ -8,8 +8,10 @@ const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const HtmlInlineCssWebpackPlugin = require('html-inline-css-webpack-plugin').default;
 const TerserWebpackPlugin = require('terser-webpack-plugin');
+const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const { entry, htmlWebpackPlugins, htmlWebpackExternalsPlugins } = setMPA();
+const { entry, htmlWebpackPlugins } = setMPA();
 const smp = new SpeedMeasurePlugin({ disable: true }); // 打包时间分析开启时会使htmlWebpackExternalsPlugins inject失效 原因未知
 
 module.exports = smp.wrap({
@@ -106,12 +108,38 @@ module.exports = smp.wrap({
       assetNameRegExp: /\.css$/g,
       cssProcessor: require('cssnano'),
     }),
-    // 打包时间分析开启时会使htmlWebpackExternalsPlugins inject失效 原因未知
-    ...htmlWebpackExternalsPlugins,
+    new CopyWebpackPlugin([
+      { from: 'node_modules/react/umd/react.production.min.js', to: 'vendors/js' },
+      { from: 'node_modules/react-dom/umd/react-dom.production.min.js', to: 'vendors/js' },
+    ]),
     ...htmlWebpackPlugins,
+    new HtmlWebpackTagsPlugin({
+      scripts: [
+        {
+          path: 'vendors/js/react.production.min.js',
+          external: {
+            packageName: 'react',
+            variableName: 'React',
+          },
+          attributes: {
+            type: 'text/javascript',
+          },
+        },
+        {
+          path: 'vendors/js/react-dom.production.min.js',
+          external: {
+            packageName: 'react-dom',
+            variableName: 'ReactDOM',
+          },
+          attributes: {
+            type: 'text/javascript',
+          },
+        },
+      ],
+    }),
     // new HtmlInlineCssWebpackPlugin(), 用来将css内联到html中
     new FriendlyErrorsWebpackPlugin(),
-    new BundleAnalyzerPlugin(),
+    // new BundleAnalyzerPlugin(),
     // 手动捕获构建错误
     function () {
       this.hooks.done.tap('done', (stats) => {
