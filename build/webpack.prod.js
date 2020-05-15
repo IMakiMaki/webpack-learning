@@ -9,7 +9,9 @@ const HtmlInlineCssWebpackPlugin = require('html-inline-css-webpack-plugin').def
 const TerserWebpackPlugin = require('terser-webpack-plugin');
 const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
 
+const DllReferencePlugin = webpack.DllReferencePlugin;
 const { setMPA } = require('./utils');
 const { entry, htmlWebpackPlugins } = setMPA();
 const smp = new SpeedMeasurePlugin({ disable: true }); // 打包时间分析开启时会使htmlWebpackExternalsPlugins inject失效 原因未知
@@ -109,11 +111,23 @@ module.exports = smp.wrap({
       cssProcessor: require('cssnano'),
     }),
     new CopyWebpackPlugin([
-      { from: 'node_modules/react/umd/react.production.min.js', to: 'vendors/js' },
-      { from: 'node_modules/react-dom/umd/react-dom.production.min.js', to: 'vendors/js' },
+      // { from: 'node_modules/react/umd/react.production.min.js', to: 'vendors/js' },
+      // { from: 'node_modules/react-dom/umd/react-dom.production.min.js', to: 'vendors/js' },
+      { from: path.join(__dirname, 'library/*.js'), to: 'vendors/', flatten: true },
     ]),
     ...htmlWebpackPlugins,
     new HtmlWebpackTagsPlugin({
+      // 引入dll分包打包后的library
+      tags: [
+        {
+          append: true,
+          path: 'vendors',
+          glob: '*.js',
+          globPath: path.join(__dirname, '../dist/vendors/'),
+        },
+      ],
+      /*  // 可以直接用HtmlWebpackTagsPlugin来代替htmlExternalsWebpackPlugin
+      // 同时这个插件可以用来给一些基础库分离 但是在启用了dll分包打包后就不需要拿来分离了
       scripts: [
         {
           path: 'vendors/js/react.production.min.js',
@@ -135,11 +149,14 @@ module.exports = smp.wrap({
             type: 'text/javascript',
           },
         },
-      ],
+      ], */
     }),
     // new HtmlInlineCssWebpackPlugin(), 用来将css内联到html中
-    new FriendlyErrorsWebpackPlugin(),
-    new BundleAnalyzerPlugin(),
+    // new FriendlyErrorsWebpackPlugin(),
+    // new BundleAnalyzerPlugin(),
+    new DllReferencePlugin({
+      manifest: require('./library/library.json'),
+    }),
     // 手动捕获构建错误
     function () {
       this.hooks.done.tap('done', (stats) => {
@@ -183,5 +200,5 @@ module.exports = smp.wrap({
       // },
     },
   },
-  stats: 'errors-only',
+  // stats: 'errors-only',
 });

@@ -9,6 +9,7 @@
     "dev": "webpack-dev-server --config build/webpack.dev.js --progress",
     "build:ssr": "webpack --config build/webpack.ssr.js --progress",
     "build:stats": "webpack --config build/webpack.prod.js --json > stat.json",
+    "dll": "webpack --config build/webpack.dll.js --progress ",
     "lint": "eslint --ext .js src",
     "fix": "eslint --fix --ext .js src"
   },
