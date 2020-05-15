@@ -1,4 +1,3 @@
-const { setMPA } = require('./utils');
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin');
@@ -11,6 +10,7 @@ const TerserWebpackPlugin = require('terser-webpack-plugin');
 const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
+const { setMPA } = require('./utils');
 const { entry, htmlWebpackPlugins } = setMPA();
 const smp = new SpeedMeasurePlugin({ disable: true }); // 打包时间分析开启时会使htmlWebpackExternalsPlugins inject失效 原因未知
 
@@ -139,7 +139,7 @@ module.exports = smp.wrap({
     }),
     // new HtmlInlineCssWebpackPlugin(), 用来将css内联到html中
     new FriendlyErrorsWebpackPlugin(),
-    // new BundleAnalyzerPlugin(),
+    new BundleAnalyzerPlugin(),
     // 手动捕获构建错误
     function () {
       this.hooks.done.tap('done', (stats) => {
