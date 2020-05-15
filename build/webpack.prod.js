@@ -1,4 +1,3 @@
-const webpack = require('webpack');
 const { setMPA } = require('./utils');
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -7,10 +6,11 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-// const HtmlInlineCssWebpackPlugin = require('html-inline-css-webpack-plugin').default;
+const HtmlInlineCssWebpackPlugin = require('html-inline-css-webpack-plugin').default;
+const TerserWebpackPlugin = require('terser-webpack-plugin');
 
 const { entry, htmlWebpackPlugins, htmlWebpackExternalsPlugins } = setMPA();
-const smp = new SpeedMeasurePlugin();
+const smp = new SpeedMeasurePlugin({ disable: true }); // 打包时间分析开启时会使htmlWebpackExternalsPlugins inject失效 原因未知
 
 module.exports = smp.wrap({
   entry: entry,
@@ -28,7 +28,23 @@ module.exports = smp.wrap({
     rules: [
       {
         test: /\.js$/,
-        use: ['babel-loader', 'eslint-loader'],
+        include: path.resolve(__dirname, '../src'),
+        use: [
+          {
+            loader: 'thread-loader',
+            options: {
+              workers: 3,
+            },
+          },
+          'babel-loader',
+          'eslint-loader',
+          {
+            loader: 'eslint-loader',
+            options: {
+              cache: true,
+            },
+          },
+        ],
       },
       {
         test: /\.css$/,
@@ -90,8 +106,9 @@ module.exports = smp.wrap({
       assetNameRegExp: /\.css$/g,
       cssProcessor: require('cssnano'),
     }),
+    // 打包时间分析开启时会使htmlWebpackExternalsPlugins inject失效 原因未知
+    ...htmlWebpackExternalsPlugins,
     ...htmlWebpackPlugins,
-    // ...htmlWebpackExternalsPlugins, // 用来抽出指定在externals.config.js中的库到 /dist/vendor
     // new HtmlInlineCssWebpackPlugin(), 用来将css内联到html中
     new FriendlyErrorsWebpackPlugin(),
     new BundleAnalyzerPlugin(),
@@ -109,22 +126,34 @@ module.exports = smp.wrap({
     },
   ],
   optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserWebpackPlugin({
+        exclude: /[\\/]node_modules[\\/]/,
+        parallel: 3,
+        terserOptions: {
+          compress: {
+            drop_console: true,
+          },
+        },
+      }),
+    ],
     splitChunks: {
-      cacheGroups: {
-        // 将node_modules的包分离
-        vendors: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendors',
-          chunks: 'all',
-        },
-        // 将commons的包分离
-        commons: {
-          test: /[\\/]src[\\/]common[\\/]/,
-          name: 'commons',
-          chunks: 'all',
-        },
-      },
+      // cacheGroups: {
+      //   // 将node_modules的包分离
+      //   vendors: {
+      //     test: /[\\/]node_modules[\\/]/,
+      //     name: 'vendors',
+      //     chunks: 'all',
+      //   },
+      //   // 将commons的包分离
+      //   commons: {
+      //     test: /[\\/]src[\\/]common[\\/]/,
+      //     name: 'commons',
+      //     chunks: 'all',
+      //   },
+      // },
     },
   },
-  // stats: 'errors-only',
+  stats: 'errors-only',
 });

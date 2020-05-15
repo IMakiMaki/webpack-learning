@@ -1,7 +1,15 @@
 /* eslint-disable */
+import 'babel-polyfill';
+
 export const one = () => {
   let test = '1221' + Math.random();
-  return 'this is one function' + Math.random() + test;
+  const MapDat = new Map([
+    [1, 2],
+    [2, 3],
+    [3, 4],
+    [4, 5]
+  ])
+  return 'this is one function' + Math.random() + test + MapDat.get(Math.random());
 };
 
 export const two = () => {

@@ -19,7 +19,7 @@ module.exports = {
         new HtmlWebpackPlugin({
           template: path.join(__dirname, `../src/pages/${pageName}/index.html`),
           filename: `${pageName}.html`,
-          chunks: [pageName],
+          chunks: ['vendors', 'commons', pageName],
           inject: true,
           minify: {
             html5: true,

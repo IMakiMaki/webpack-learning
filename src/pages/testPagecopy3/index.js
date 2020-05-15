@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import icon from '@/images/icon.png';
 import './index.less';
 import '@/common/css/index.css';
+import 'babel-polyfill';
 import '@/common/css/index2.css';
 
 class Search extends React.Component {
