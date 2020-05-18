@@ -116,14 +116,16 @@ module.exports = smp.wrap({
       { from: path.join(__dirname, 'library/*.js'), to: 'vendors/', flatten: true },
     ]),
     ...htmlWebpackPlugins,
+    new DllReferencePlugin({
+      manifest: require('./library/library.json'),
+    }),
     new HtmlWebpackTagsPlugin({
       // 引入dll分包打包后的library
       tags: [
         {
-          append: true,
-          path: 'vendors',
+          path: 'js',
           glob: '*.js',
-          globPath: path.join(__dirname, '../dist/vendors/'),
+          globPath: path.resolve(__dirname, '../dist/vendors'),
         },
       ],
       /*  // 可以直接用HtmlWebpackTagsPlugin来代替htmlExternalsWebpackPlugin
@@ -154,9 +156,6 @@ module.exports = smp.wrap({
     // new HtmlInlineCssWebpackPlugin(), 用来将css内联到html中
     // new FriendlyErrorsWebpackPlugin(),
     // new BundleAnalyzerPlugin(),
-    new DllReferencePlugin({
-      manifest: require('./library/library.json'),
-    }),
     // 手动捕获构建错误
     function () {
       this.hooks.done.tap('done', (stats) => {
