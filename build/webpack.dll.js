@@ -9,7 +9,7 @@ module.exports = {
   },
   output: {
     filename: '[name]_[hash].dll.js',
-    path: path.join(__dirname, '../library'),
+    path: path.join(__dirname, './library'),
     library: '[name]_[hash]',
   },
   plugins: [

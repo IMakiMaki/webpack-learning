@@ -14,7 +14,7 @@ const webpack = require('webpack');
 const DllReferencePlugin = webpack.DllReferencePlugin;
 const { setMPA } = require('./utils');
 const { entry, htmlWebpackPlugins } = setMPA();
-const smp = new SpeedMeasurePlugin({ disable: true }); // 打包时间分析开启时会使htmlWebpackExternalsPlugins inject失效 原因未知
+const smp = new SpeedMeasurePlugin(); // 打包时间分析开启时会使htmlWebpackExternalsPlugins inject失效 原因未知
 
 module.exports = smp.wrap({
   entry: entry,
@@ -111,8 +111,6 @@ module.exports = smp.wrap({
       cssProcessor: require('cssnano'),
     }),
     new CopyWebpackPlugin([
-      // { from: 'node_modules/react/umd/react.production.min.js', to: 'vendors/js' },
-      // { from: 'node_modules/react-dom/umd/react-dom.production.min.js', to: 'vendors/js' },
       { from: path.join(__dirname, 'library/*.js'), to: 'vendors/', flatten: true },
     ]),
     ...htmlWebpackPlugins,
@@ -123,9 +121,10 @@ module.exports = smp.wrap({
       // 引入dll分包打包后的library
       tags: [
         {
-          path: 'js',
+          append: false,
+          path: 'vendors',
           glob: '*.js',
-          globPath: path.resolve(__dirname, '../dist/vendors'),
+          globPath: path.resolve(__dirname, './library'),
         },
       ],
       /*  // 可以直接用HtmlWebpackTagsPlugin来代替htmlExternalsWebpackPlugin
@@ -154,8 +153,8 @@ module.exports = smp.wrap({
       ], */
     }),
     // new HtmlInlineCssWebpackPlugin(), 用来将css内联到html中
-    // new FriendlyErrorsWebpackPlugin(),
-    // new BundleAnalyzerPlugin(),
+    new FriendlyErrorsWebpackPlugin(),
+    new BundleAnalyzerPlugin(),
     // 手动捕获构建错误
     function () {
       this.hooks.done.tap('done', (stats) => {
@@ -199,5 +198,5 @@ module.exports = smp.wrap({
       // },
     },
   },
-  // stats: 'errors-only',
+  stats: 'errors-only',
 });
