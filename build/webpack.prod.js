@@ -9,12 +9,16 @@ const HtmlInlineCssWebpackPlugin = require('html-inline-css-webpack-plugin').def
 const TerserWebpackPlugin = require('terser-webpack-plugin');
 const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+// const CheckDllFilesWebpackPlugin = require('./plugins/CheckDllFilesWebpackPlugin');
 const webpack = require('webpack');
 
 const DllReferencePlugin = webpack.DllReferencePlugin;
 const { setMPA } = require('./utils');
 const { entry, htmlWebpackPlugins } = setMPA();
-const smp = new SpeedMeasurePlugin(); // 打包时间分析开启时会使htmlWebpackExternalsPlugins inject失效 原因未知
+const smp = new SpeedMeasurePlugin({ disable: true });
+// 打包时间分析开启时会使htmlWebpackExternalsPlugins inject失效 原因或许是：
+// https://github.com/stephencookdev/speed-measure-webpack-plugin/issues/92
 
 module.exports = smp.wrap({
   entry: entry,
@@ -25,8 +29,16 @@ module.exports = smp.wrap({
   mode: 'production',
   resolve: {
     alias: {
+      // 经过试验，指定入口文件目前不能优化构建速度了
+      // react: path.resolve(__dirname, '../node_modules/react/umd/react.production.min.js'),
+      // 'react-dom': path.resolve(
+      //   __dirname,
+      //   '../node_modules/react-dom/umd/react-dom.production.min.js'
+      // ),
       '@': path.resolve(__dirname, '../src'),
     },
+    extensions: ['.js'],
+    mainFields: ['main'],
   },
   module: {
     rules: [
@@ -37,10 +49,15 @@ module.exports = smp.wrap({
           {
             loader: 'thread-loader',
             options: {
-              workers: 3,
+              workers: 2, // 多线程开启反而打包速度会变慢，原因未知 也许是因为电脑cpu主频太弱，或者是webpack4本身就有优化
             },
           },
-          'babel-loader',
+          {
+            loader: 'babel-loader',
+            options: {
+              cacheDirectory: true,
+            },
+          },
           'eslint-loader',
           {
             loader: 'eslint-loader',
@@ -106,6 +123,7 @@ module.exports = smp.wrap({
     new MiniCssExtractPlugin({
       filename: '[name]_[contenthash:8].css',
     }),
+    new HardSourceWebpackPlugin(),
     new OptimizeCssAssetsWebpackPlugin({
       assetNameRegExp: /\.css$/g,
       cssProcessor: require('cssnano'),
@@ -127,7 +145,7 @@ module.exports = smp.wrap({
           globPath: path.resolve(__dirname, './library'),
         },
       ],
-      /*  // 可以直接用HtmlWebpackTagsPlugin来代替htmlExternalsWebpackPlugin
+      /* 可以直接用HtmlWebpackTagsPlugin来代替htmlExternalsWebpackPlugin
       // 同时这个插件可以用来给一些基础库分离 但是在启用了dll分包打包后就不需要拿来分离了
       scripts: [
         {
@@ -154,26 +172,16 @@ module.exports = smp.wrap({
     }),
     // new HtmlInlineCssWebpackPlugin(), 用来将css内联到html中
     new FriendlyErrorsWebpackPlugin(),
-    new BundleAnalyzerPlugin(),
-    // 手动捕获构建错误
-    function () {
-      this.hooks.done.tap('done', (stats) => {
-        if (
-          stats.compilation.errors &&
-          stats.compilation.errors.length &&
-          process.argv.indexOf('--watch') === -1
-        ) {
-          console.log('build error');
-        }
-      });
-    },
+    // new BundleAnalyzerPlugin(),
+    // new CheckDllFilesWebpackPlugin(),
   ],
   optimization: {
     minimize: true,
     minimizer: [
       new TerserWebpackPlugin({
         exclude: /[\\/]node_modules[\\/]/,
-        parallel: 3,
+        parallel: true,
+        cache: true,
         terserOptions: {
           compress: {
             drop_console: true,
